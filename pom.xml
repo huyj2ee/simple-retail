@@ -63,6 +63,22 @@
       <version>${spring.boot.version}</version>
       <scope>test</scope>
     </dependency>
+
+    <!-- Include JPA library -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-gcp-starter</artifactId>
+      <version>LATEST</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-gcp-starter-sql-mysql</artifactId>
+      <version>LATEST</version>
+    </dependency>
   </dependencies>
 
   <!-- Import dependency management from Spring Boot -->
