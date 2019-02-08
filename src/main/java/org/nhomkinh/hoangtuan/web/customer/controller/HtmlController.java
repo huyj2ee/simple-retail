@@ -11,7 +11,7 @@ import org.nhomkinh.hoangtuan.web.customer.repository.ProductRepository;
 
 
 @Controller
-public class HomeController {
+public class HtmlController {
   @Autowired
   private ProductRepository rep;
 
