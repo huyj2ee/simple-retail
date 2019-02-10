@@ -8,23 +8,17 @@ import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
 import javax.persistence.CascadeType;
-
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import java.util.Set;
 import java.util.HashSet;
 
 
 @Entity
-public class Product {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class Product {
   @Id
   private String code;
-
-  private String name;
-
-  private String brief;
-
-  private String description;
-
-  private String note;
 
   //private Set<Image> images;
 
@@ -47,25 +41,15 @@ public class Product {
     this.prices = new HashSet<Price>();
   }
 
-  public String getCode() {
-    return this.code;
-  }
+  public abstract String getCode();
 
-  public String getName() {
-    return this.name;
-  }
+  public abstract String getName();
 
-  public String getBrief() {
-    return this.brief;
-  }
+  public abstract String getBrief();
 
-  public String getDescription() {
-    return this.description;
-  }
+  public abstract String getDescription();
 
-  public String getNote() {
-    return this.note;
-  }
+  public abstract String getNote();
 
   public ManufactureCountry getOrigin() {
     return this.origin;
@@ -75,25 +59,15 @@ public class Product {
     return this.prices;
   }
 
-  public void setCode(String code) {
-    this.code = code;
-  }
+  public abstract void setCode(String code);
 
-  public void setName(String name) {
-    this.name = name;
-  }
+  public abstract void setName(String name);
 
-  public void setBrief(String brief) {
-    this.brief = brief;
-  }
+  public abstract void setBrief(String brief);
 
-  public void setDescription(String description) {
-    this.description = description;
-  }
+  public abstract void setDescription(String description);
 
-  public void setNote(String note) {
-    this.note = note;
-  }
+  public abstract void setNote(String note);
 
   public void setOrigin(ManufactureCountry origin) {
     this.origin = origin;

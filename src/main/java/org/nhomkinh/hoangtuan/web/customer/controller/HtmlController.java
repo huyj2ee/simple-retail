@@ -2,30 +2,61 @@ package org.nhomkinh.hoangtuan.web.customer.controller;
 
 
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.nhomkinh.hoangtuan.web.customer.model.Product;
+import org.nhomkinh.hoangtuan.web.customer.model.ProductVN;
 import org.nhomkinh.hoangtuan.web.customer.model.Price;
 import org.nhomkinh.hoangtuan.web.customer.model.ManufactureCountry;
+import org.nhomkinh.hoangtuan.web.customer.repository.ProductVNRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.ProductENRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ManufactureCountryRepository;
 import java.util.Calendar;
 import java.sql.Date;
 
 
+import org.phamsodiep.utils.Language;
+import org.phamsodiep.utils.MultiLocaleDAO;
+
+
 @Controller
 public class HtmlController {
   @Autowired
-  ManufactureCountryRepository originRepository;
+  private ManufactureCountryRepository originRepository;
 
-  @Autowired
-  private ProductRepository rep;
+  private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
+
+  public HtmlController(
+    @Autowired ProductVNRepository vnRep,
+    @Autowired ProductENRepository enRep
+  ) {
+    ProductRepository[] productRepositories = new ProductRepository[Language.COUNT.ordinal()];
+    productRepositories[Language.VN.ordinal()] = vnRep;
+    productRepositories[Language.EN.ordinal()] = enRep;
+    this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
+      MultiLocaleDAO.getInstance(Product.class,productRepositories);
+  }
 
   @GetMapping("/")
-  public String homePage(Model model) {
-    String msg = "";
+  public String homePage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = ""
+    ) String lang,
+    Model model
+  ) {
+    if (lang.length() == 0) {
+      lang = Language.VN.name();
+    }
+    ProductRepository rep = this.multiLocaleDAO.getRepository(lang);
+
+    String msg = "[" + lang + rep.toString() + "]";
+
     Iterable<Product> products = rep.findAll();
     for (Product product : products) {
       msg += product.getCode() + ":";
@@ -35,6 +66,12 @@ public class HtmlController {
       }
       msg += "\n";
     }
+
+    Product pro = rep.findByCode("CD008");
+    if (pro != null && pro.getCode() != null) {
+      msg += "Tim duoc code CD008: restate" + pro.getCode() + "\n";
+    }
+
     model.addAttribute("appName", msg);
     return "index";
   }
@@ -69,11 +106,24 @@ public class HtmlController {
   }
 
   @GetMapping("/populate")
-  public String populateDataPage(Model model) {
+  public String populateDataPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = ""
+    ) String lang,
+    Model model
+  ) {
+    if (lang.length() == 0) {
+      lang = Language.VN.name();
+    }
+    ProductRepository rep = this.multiLocaleDAO.getRepository(lang);
+
     int day = 1;
     Calendar cal = Calendar.getInstance();
     cal.set(2019, 2, day++);
-    String msg = populateManufactureCountry();
+    String msg = lang + "\n" + rep.toString() + "\n" + populateManufactureCountry();
+
 
     String[] ccodes = {
       "vn",
@@ -90,13 +140,13 @@ public class HtmlController {
       "cn"
     };
 
-
     try {
       int i;
       int j;
       int n = 0;
       for (i = 0; i < 10; i++) {
-        Product p = new Product();
+        Product p = (Product)multiLocaleDAO.createModelObject(lang);
+
         p.setCode("CD00" + i);
         ManufactureCountry mc = originRepository.findById(ccodes[i]).orElse(null);
         if (i % 2 == 0) {
@@ -121,6 +171,9 @@ public class HtmlController {
     model.addAttribute("appName", msg);
     return "index";
   }
+
 }
+
+
 
 
