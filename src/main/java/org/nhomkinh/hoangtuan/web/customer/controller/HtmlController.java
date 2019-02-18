@@ -7,14 +7,31 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+
+import org.nhomkinh.hoangtuan.web.customer.utils.InheritanceDAO;
+
 import org.nhomkinh.hoangtuan.web.customer.model.Product;
 import org.nhomkinh.hoangtuan.web.customer.model.ProductVN;
 import org.nhomkinh.hoangtuan.web.customer.model.Price;
 import org.nhomkinh.hoangtuan.web.customer.model.ManufactureCountry;
+
+import org.nhomkinh.hoangtuan.web.customer.model.Unit;
+import org.nhomkinh.hoangtuan.web.customer.model.DimensionUnit;
+import org.nhomkinh.hoangtuan.web.customer.model.ProductUnit;
+import org.nhomkinh.hoangtuan.web.customer.model.ManufacturedProductUnit;
+import org.nhomkinh.hoangtuan.web.customer.model.CustomizedCutProductUnit;
+
+
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductVNRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductENRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ManufactureCountryRepository;
+
+import org.nhomkinh.hoangtuan.web.customer.repository.UnitRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.DimensionUnitRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.ProductUnitRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.ManufacturedProductUnitRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.CustomizedCutProductUnitRepository;
 import java.util.Calendar;
 import java.sql.Date;
 
@@ -30,15 +47,29 @@ public class HtmlController {
 
   private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
 
+  private InheritanceDAO<UnitRepository, Unit> inheritanceDAO;
+
   public HtmlController(
     @Autowired ProductVNRepository vnRep,
-    @Autowired ProductENRepository enRep
+    @Autowired ProductENRepository enRep,
+    @Autowired ManufactureCountryRepository manufactureCountryRepository,
+    @Autowired DimensionUnitRepository dimensionUnitRepository,
+    @Autowired ProductUnitRepository productUnitRepository,
+    @Autowired ManufacturedProductUnitRepository manufacturedProductUnitRepository,
+    @Autowired CustomizedCutProductUnitRepository customizedCutProductUnitRepository
   ) {
     ProductRepository[] productRepositories = new ProductRepository[Language.COUNT.ordinal()];
     productRepositories[Language.VN.ordinal()] = vnRep;
     productRepositories[Language.EN.ordinal()] = enRep;
     this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
       MultiLocaleDAO.getInstance(Product.class,productRepositories);
+
+    this.inheritanceDAO = new InheritanceDAO<UnitRepository, Unit>(
+      DimensionUnit.class, dimensionUnitRepository,
+      ProductUnit.class, productUnitRepository,
+      ManufacturedProductUnit.class, manufacturedProductUnitRepository,
+      CustomizedCutProductUnit.class, customizedCutProductUnitRepository
+    );
   }
 
   @GetMapping("/")
@@ -172,6 +203,100 @@ public class HtmlController {
     return "index";
   }
 
+  @GetMapping("/cu")
+  public String createUnitDataPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = ""
+    ) String lang,
+    Model model
+  ) {
+    if (lang.length() == 0) {
+      lang = Language.VN.name();
+    }
+    String msg = "UnitRepository: ";
+
+    UnitRepository ur = this.inheritanceDAO.getRepository(DimensionUnit.class);
+
+    try {
+      DimensionUnit u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setName("d1");
+      ur.save(u);
+
+      u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setName("d2");
+      ur.save(u);
+
+      u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setName("d3");
+      ur.save(u);
+
+      ProductUnit p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setName("p1");
+      ur.save(p);
+
+      p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setName("p2");
+      ur.save(p);
+
+      p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setName("p3");
+      ur.save(p);
+
+      p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setName("p4");
+      ur.save(p);
+
+
+      ManufacturedProductUnit mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setName("mp1");
+      mp.setValue(100);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setName("mp2");
+      mp.setValue(200);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setName("mp3");
+      mp.setValue(300);
+      ur.save(mp);
+
+
+      CustomizedCutProductUnit cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setName("cp1");
+      cp.setMinValue(1000);
+      cp.setMaxValue(1100);
+      ur.save(cp);
+
+      cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setName("cp2");
+      cp.setMinValue(2000);
+      cp.setMaxValue(2200);
+      ur.save(cp);
+
+      cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setName("cp3");
+      cp.setMinValue(3000);
+      cp.setMaxValue(3300);
+      ur.save(cp);
+
+      cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setName("cp4");
+      cp.setMinValue(4000);
+      cp.setMaxValue(4400);
+      ur.save(cp);
+
+      msg += "Succ";
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException";
+    }
+    model.addAttribute("appName", msg);
+    return "index";
+  }
 }
 
 
