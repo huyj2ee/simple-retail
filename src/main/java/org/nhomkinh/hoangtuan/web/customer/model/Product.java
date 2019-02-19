@@ -4,12 +4,13 @@ package org.nhomkinh.hoangtuan.web.customer.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.FetchType;
-import javax.persistence.CascadeType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.ElementCollection;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -20,21 +21,24 @@ public abstract class Product {
   @Id
   private String code;
 
-  //private Set<Image> images;
-
-  //private Category category;
-
-  //private Set<ProductUnit> unit;
-
   @ManyToOne(fetch = FetchType.EAGER)
   @JoinColumn(name="origin")
   private ManufactureCountry origin;
 
-  //private Dimension dimension;
-
-  @OneToMany(fetch = FetchType.EAGER, mappedBy = "product",
-    cascade = {CascadeType.ALL}, orphanRemoval = true)
+  @ElementCollection
+  @JoinTable(
+    joinColumns = @JoinColumn(name = "prod_id"),
+    name="price"
+  )
   private Set<Price> prices;
+
+  @ManyToMany(fetch = FetchType.EAGER)
+  @JoinTable(
+    joinColumns = @JoinColumn(name = "prod_id"),
+    inverseJoinColumns = @JoinColumn(name = "unit_id"),
+    name="price"
+  )
+  private Set<ProductUnit> units;
 
 
   public Product() {
@@ -76,11 +80,6 @@ public abstract class Product {
   public void setPrices(Set<Price> prices) {
     this.prices.retainAll(prices);
     this.prices.addAll(prices);
-    for (Price price : this.prices) {
-      if (price.getProduct() != this) {
-        price.setProduct(this);
-      }
-    }
   }
 }
 

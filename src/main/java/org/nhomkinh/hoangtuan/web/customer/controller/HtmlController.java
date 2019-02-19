@@ -190,7 +190,9 @@ public class HtmlController {
             Price v = new Price();
             v.setDate(new Date(cal.getTime().getTime()));
             cal.set(2019, 2, day++);
-            v.setProduct(p);
+            //v.setProduct(p);
+            v.setUnitId(8 + j);
+            p.getPrices().add(v);
         }
         rep.save(p);
       }

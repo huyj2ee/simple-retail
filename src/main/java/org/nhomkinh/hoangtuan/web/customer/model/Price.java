@@ -1,24 +1,30 @@
 package org.nhomkinh.hoangtuan.web.customer.model;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
 import java.sql.Date;
 
 
-@Entity
+@Embeddable
 public class Price {
+  @Column
   private int value;
 
-  @Id
+  @Column
   private Date date;
 
-  @ManyToOne
-  @JoinColumn(name = "pid", nullable=false)
-  private Product product;
+  @Column(name="unit_id")
+  private int unitId;
 
+
+  public int getUnitId() {
+    return this.unitId;
+  }
+
+  public void setUnitId(int unitId) {
+    this.unitId = unitId;
+  }
 
   public int getValue() {
     return this.value;
@@ -28,23 +34,12 @@ public class Price {
     return this.date;
   }
 
-  public Product getProduct() {
-    return this.product;
-  }
-
   public void setValue(int value) {
     this.value = value;
   }
 
   public void setDate(Date date) {
     this.date = date;
-  }
-
-  public void setProduct(Product product) {
-    this.product = product;
-    if (this.product != null) {
-      this.product.getPrices().add(this);
-    }
   }
 }
 
