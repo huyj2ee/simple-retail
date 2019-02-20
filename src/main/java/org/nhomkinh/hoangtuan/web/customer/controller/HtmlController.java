@@ -51,6 +51,9 @@ public class HtmlController {
   @Autowired
   private CategoryRepository categoryRepository;
 
+  @Autowired
+  private ProductUnitRepository productUnitRepository;
+
   private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
 
   private InheritanceDAO<UnitRepository, Unit> inheritanceDAO;
@@ -338,6 +341,66 @@ public class HtmlController {
     }
     model.addAttribute("appName", msg);
     return "index";
+  }
+
+  @GetMapping("/hoangtuanv")
+  public String viewHoangTuanPopulatedDataPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = ""
+    ) String lang,
+    Model model
+  ) {
+    if (lang.length() == 0) {
+      lang = Language.VN.name();
+    }
+    String msg = "[";
+
+    try {
+      Category cat = this.categoryRepository.findById(10).orElse(null);
+      Iterable<Product> products = cat.getProducts();
+      for (Product p : products) {
+        msg += "\n\t\t";
+        msg += p.getCode();
+        msg += "\n\t\t";
+        msg += p.getName();
+        msg += "\n\t\t";
+        msg += p.getBrief();
+        msg += "\n\t\t";
+        msg += p.getDescription();
+        msg += "\n\t\t";
+        msg += (p.getNote() == null ? "[!]" : p.getNote());
+        msg += "\n\t\t";
+        msg += p.getOrigin().getCode() + ":" + p.getOrigin().getName();
+        for (Image img : p.getImages()) {
+          msg += "\n\t\t\t";
+          msg += img.getUri();
+        }
+        for (Price price : p.getPrices()) {
+          msg += "\n\t\t\t";
+          msg += price.getValue();
+          msg += "\n\t\t\t";
+          msg += "time: " + price.getDate().getTime();
+          ProductUnit pu = this.productUnitRepository.findById(price.getUnitId()).orElse(null);
+          msg += "\n\t\t\t\t";
+          msg += pu.getId();
+          msg += "\n\t\t\t\t";
+          msg += pu.getName();
+          msg += "\n\t\t\t\t";
+          msg += pu.getCaption();
+          msg += "\n\t\t\t\t";
+          msg += pu.getDescription();
+        }
+      }
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException" + daoException.getMessage();
+    }
+    msg += "]";
+
+    model.addAttribute("appName", msg);
+    return "index";    
   }
 
   @GetMapping("/hoangtuan")
