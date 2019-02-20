@@ -21,12 +21,14 @@ import org.nhomkinh.hoangtuan.web.customer.model.ProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.ManufacturedProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.CustomizedCutProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.Image;
+import org.nhomkinh.hoangtuan.web.customer.model.Category;
 
 
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductVNRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductENRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ManufactureCountryRepository;
+import org.nhomkinh.hoangtuan.web.customer.repository.CategoryRepository;
 
 import org.nhomkinh.hoangtuan.web.customer.repository.UnitRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.DimensionUnitRepository;
@@ -45,6 +47,9 @@ import org.phamsodiep.utils.MultiLocaleDAO;
 public class HtmlController {
   @Autowired
   private ManufactureCountryRepository originRepository;
+
+  @Autowired
+  private CategoryRepository categoryRepository;
 
   private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
 
@@ -140,7 +145,7 @@ public class HtmlController {
       }
     }
     catch(DataAccessException daoException) {
-      msg += "DataAccessException_";
+      msg += "DataAccessException_" + daoException.getMessage();
     }
     return msg;
   }
@@ -212,7 +217,7 @@ public class HtmlController {
       msg += "Succ";
     }
     catch(DataAccessException daoException) {
-      msg += "DataAccessException";
+      msg += "DataAccessException" + daoException.getMessage();
     }
     model.addAttribute("appName", msg);
     return "index";
@@ -227,6 +232,7 @@ public class HtmlController {
     ) String lang,
     Model model
   ) {
+    int id = 1;
     if (lang.length() == 0) {
       lang = Language.VN.name();
     }
@@ -236,69 +242,90 @@ public class HtmlController {
 
     try {
       DimensionUnit u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(id++);
       u.setName("d1");
       ur.save(u);
 
       u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(id++);
       u.setName("d2");
       ur.save(u);
 
       u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(id++);
       u.setName("d3");
-      ur.save(u);
+      u = (DimensionUnit) ur.save(u);
 
       ProductUnit p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(id++);
       p.setName("p1");
       ur.save(p);
 
       p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(id++);
       p.setName("p2");
       ur.save(p);
 
       p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(id++);
       p.setName("p3");
       ur.save(p);
 
       p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(id++);
       p.setName("p4");
       ur.save(p);
 
 
       ManufacturedProductUnit mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(id++);
       mp.setName("mp1");
       mp.setValue(100);
       ur.save(mp);
 
       mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(id++);
       mp.setName("mp2");
       mp.setValue(200);
       ur.save(mp);
 
       mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(id++);
       mp.setName("mp3");
       mp.setValue(300);
       ur.save(mp);
 
 
       CustomizedCutProductUnit cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(id++);
       cp.setName("cp1");
       cp.setMinValue(1000);
       cp.setMaxValue(1100);
       ur.save(cp);
 
       cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(id++);
       cp.setName("cp2");
       cp.setMinValue(2000);
       cp.setMaxValue(2200);
       ur.save(cp);
 
       cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(id++);
       cp.setName("cp3");
       cp.setMinValue(3000);
       cp.setMaxValue(3300);
       ur.save(cp);
 
       cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(id++);
       cp.setName("cp4");
       cp.setMinValue(4000);
       cp.setMaxValue(4400);
@@ -307,10 +334,323 @@ public class HtmlController {
       msg += "Succ";
     }
     catch(DataAccessException daoException) {
-      msg += "DataAccessException";
+      msg += "DataAccessException" + daoException.getMessage();
     }
     model.addAttribute("appName", msg);
     return "index";
+  }
+
+  @GetMapping("/hoangtuan")
+  public String populateHoangTuanDataPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = ""
+    ) String lang,
+    Model model
+  ) {
+    if (lang.length() == 0) {
+      lang = Language.VN.name();
+    }
+    String msg = "";
+
+    msg += populateUnitHoangTuanData();
+    msg += populateOriginCountryHoangTuanData();
+    msg += populateCategoryHoangTuanData();
+    msg += populateProductHoangTuanData(lang);
+
+
+    model.addAttribute("appName", msg);
+    return "index";
+  }
+
+  private String populateUnitHoangTuanData() {
+    String msg = "";
+    UnitRepository ur = null;
+
+    try {
+      // DimensionUnit
+      ur = this.inheritanceDAO.getRepository(DimensionUnit.class);
+      DimensionUnit u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(1);
+      u.setName("m");
+      ur.save(u);
+
+      u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(2);
+      u.setName("kg");
+      ur.save(u);
+      u = (DimensionUnit) ur.findById(1).orElse(null);
+
+      // ProductUnit - dummy
+      ur = this.inheritanceDAO.getRepository(ProductUnit.class);
+      ProductUnit p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(1);
+      p.setName("pc");
+      ur.save(p);
+
+      p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(2);
+      p.setName("bar");
+      ur.save(p);
+
+      // ManufacturedProductUnit
+      ur = this.inheritanceDAO.getRepository(ManufacturedProductUnit.class);
+      ManufacturedProductUnit mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(101);
+      mp.setName("bar");
+      mp.setValue(4);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(102);
+      mp.setName("bar");
+      mp.setValue(6);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(103);
+      mp.setName("bar");
+      mp.setValue(8);
+      ur.save(mp);
+
+      // CustomizedCutProductUnit
+      CustomizedCutProductUnit cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(201);
+      cp.setName("bar");
+      cp.setMinValue(1);
+      cp.setMaxValue(3);
+      ur.save(cp);
+
+      msg += " [Unit->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException@Unit" + daoException.getMessage();
+    }
+
+    return msg;
+  }
+
+  private String populateOriginCountryHoangTuanData() {
+    String[] codes = {
+      "vn",
+      "tw",
+      "cn"
+    };
+    String[] uris = {
+      "flags/vn.png",
+      "flags/tw.png",
+      "flags/cn.png"
+    };
+    String msg = "";
+
+    try {
+      for(int i = 0; i < codes.length; i++) {
+          ManufactureCountry mc = new ManufactureCountry();
+          mc.setCode(codes[i]);
+          Image img = new Image();
+          img.setUri(uris[i]);
+          this.originRepository.save(mc);
+      }
+      msg += " [OriginCountry->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += " DataAccessException@OriginCountry " + daoException.getMessage();
+    }
+    return msg;
+  }
+
+  private String populateCategoryHoangTuanData() {
+    String[] names = {
+      "RF",                // 0. Rod and flats
+      "PT",                // 1. Pipes and tubes
+      "AC",                // 2. Angles and channels
+      "H",                 // 3. Hardware
+      "A",                 // 4. Architectural
+      "TB",                // 5. Transport and bus body
+      "E",                 // 6. Electrical
+      "TL",                // 7. Transmission line hardware
+      "I",                 // 8. Industrial
+      "M",                 // 9. Miscellaneous
+      // 0. Rod and flats childs:
+      "RR",                // 10. Round Rod
+      "FB",                // 11. Flat Bar
+      "REF",               // 12. Round Edge Flat
+      "HRF",               // 13. Haft Round Flat
+      "FCF",               // 14. Flat Coil Form
+      "SB",                // 15. Square Bar 
+      "RFB",               // 16. Rectangular Flat Bar    
+      // 1. Pipes and tubes childs:
+      // 2. Angles and channels childs:
+      // 3. Hardware childs:
+      // 4. Architectural childs:
+      // 5. Transport and bus body childs:
+      // 6. Electrical childs:
+      // 7. Transmission line hardware childs:
+      // 8. Industrial childs:
+      // 9. Miscellaneous childs:
+    };
+
+    Integer[] parents = {
+      null,                // 0. Rod and flats
+      null,                // 1. Pipes and tubes
+      null,                // 2. Angles and channels
+      null,                // 3. Hardware
+      null,                // 4. Architectural
+      null,                // 5. Transport and bus body
+      null,                // 6. Electrical
+      null,                // 7. Transmission line hardware
+      null,                // 8. Industrial
+      null,                // 9. Miscellaneous
+      0,                   // 10. Round Rod
+      0,                   // 11. Flat Bar
+      0,                   // 12. Round Edge Flat
+      0,                   // 13. Haft Round Flat
+      0,                   // 14. Flat Coil Form
+      0,                   // 15. Square Bar 
+      0,                   // 16. Rectangular Flat Bar 
+    };
+
+    String msg = "";
+
+    try {
+      for(int i = 0; i < names.length; i++) {
+        Category cat = new Category();
+        cat.setId(i);
+        cat.setName(names[i]);
+        Integer parentId = parents[i];
+        if (parentId != null) {
+          // Load parent
+          Category parentCat = this.categoryRepository.findById(parentId).orElse(null);
+          // Set parent
+          cat.setParentCategory(parentCat);
+        }
+        this.categoryRepository.save(cat);
+      }
+      msg += " [Category->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += " DataAccessException@Category " + daoException.getMessage();
+    }
+    return msg;
+  }
+
+  private String populateProductHoangTuanData(String lang) {
+    String[] productNames = new String[] {
+      // product name line by line
+      "Round Rod",
+      "Round Rod"
+    };
+
+    String[] productBrief = new String[] {
+      // product brief line by line
+      "Round Rod small",
+      "Round Rod small",
+    };
+
+    String[] productDesc = new String[] {
+      // product desc line by line
+      "Round Rod small: D=5.00mm, Weight 195GM/3.66M",
+      "Round Rod small: D=5.00mm, Weight 195GM/3.66M",
+    };
+
+
+
+    String[] productCodes = new String[] {
+      // product code line by line
+      "ht-1149-a",
+      "ht-1149-b",
+    };
+    String[] originIds = new String[] {
+      // product orgin line by line
+      "tw",
+      "cn",
+    };
+    String[][] productsImages = new String[][] {
+      new String[] { // list of images for product 0
+        "/products/ht-1149-1.jpg",
+        "/products/ht-1149-2.jpg"
+      },
+      new String[] {
+        "/products/ht-1149-1.jpg",
+        "/products/ht-1149-2.jpg"
+      },
+    };
+
+    // ManufacturedProductUnit
+    // 101 - bar 4m
+    // 102 - bar 6m
+    // 103 - bar 8m
+    // CustomizedCutProductUnit
+    // 201 - bar 1-3m
+    int[][][] productsPrices = new int[][][] {
+      new int[][] {    // list of prices for product 0
+        // price[0] -> product unit, price[1] -> value
+        new int[] {101, 1400000},
+        new int[] {102, 1600000},
+        new int[] {103, 2600000},
+        new int[] {201,  420000}
+      },
+      new int[][] {    // list of prices for product 1
+        // price[0] -> product unit, price[1] -> value
+        new int[] {101, 1300000},
+        new int[] {102, 1500000},
+        new int[] {103, 2500000},
+        new int[] {201,  400000}
+//        new int[] {201,  350000}
+      }
+    };
+
+    ProductRepository productRepository = this.multiLocaleDAO.getRepository(lang);
+    String msg = "";
+
+    try {
+      int i;
+      int j;
+      int n = 0;
+      Category cat = this.categoryRepository.findById(10).orElse(null);
+      for (i = 0; i < productCodes.length; i++) {
+        // Create product
+        Product p = (Product)multiLocaleDAO.createModelObject(lang);
+        p.setCode(productCodes[i]);
+        p.setCategory(cat);
+        p.setName(productNames[i]);
+        p.setBrief(productBrief[i]);
+        p.setDescription(productDesc[i]);
+        // Attach product to its orignin object
+        ManufactureCountry origin = originRepository.findById(originIds[i]).orElse(null);
+        p.setOrigin(origin);
+        // Create product images
+        String[] productImages = productsImages[i];
+        for (j = 0; j < productImages.length; j++) {
+          Image img = new Image();
+          img.setUri(productImages[j]);
+          p.getImages().add(img);
+        }
+        // Attach product to its unit objects and create price
+        int[][] productPrices = productsPrices[i];
+        for (j = 0; j < productPrices.length; j++) {
+          int[] productPrice = productPrices[j];
+          Price price = new Price();
+          price.setDate(new Date(100));
+          price.setUnitId(productPrice[0]);
+          price.setValue(productPrice[1]);
+          p.getPrices().add(price);
+        }
+        productRepository.save(p);
+      }
+
+
+      msg += " [Product->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException@Product" + daoException.getMessage();
+    }
+    return msg;
   }
 }
 
