@@ -22,7 +22,7 @@ public class Category {
 
   @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn
-  private Category category;
+  private Category parentCategory;
 
 
   public int getId() {
@@ -37,8 +37,8 @@ public class Category {
     return this.image;
   }
 
-  public Category getCategory() {
-    return this.category;
+  public Category getParentCategory() {
+    return this.parentCategory;
   }
 
   public void setId(int id) {
@@ -53,8 +53,8 @@ public class Category {
     this.image = image;
   }
 
-  public void setCategory(Category category) {
-    this.category = category;
+  public void setParentCategory(Category parentCategory) {
+    this.parentCategory = parentCategory;
   }
 }
 
