@@ -50,6 +50,17 @@ public abstract class Product {
   )
   private Set<Image> images;
 
+  @ManyToOne(
+    optional=false,
+    fetch = FetchType.EAGER,
+    cascade = {
+      CascadeType.REFRESH,
+      CascadeType.DETACH
+    }
+  )
+  @JoinColumn
+  private Category category;
+
 
   public Product() {
     this.prices = new HashSet<Price>();
@@ -78,6 +89,10 @@ public abstract class Product {
     return this.images;
   }
 
+  public Category getCategory() {
+    return this.category;
+  }
+
   public abstract void setCode(String code);
 
   public abstract void setName(String name);
@@ -100,6 +115,10 @@ public abstract class Product {
   public void setImages(Set<Image> images) {
     this.images.retainAll(images);
     this.images.addAll(images);
+  }
+
+  public void setCategory(Category category) {
+    this.category = category;
   }
 }
 
