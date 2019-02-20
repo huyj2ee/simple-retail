@@ -10,9 +10,9 @@ import javax.persistence.CascadeType;
 
 
 @Entity
-public class ManufactureCountry {
+public class Category {
   @Id
-  private String code;
+  private int id;
 
   private String name;
 
@@ -20,9 +20,13 @@ public class ManufactureCountry {
   @JoinColumn
   private Image image;
 
+  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @JoinColumn
+  private Category category;
 
-  public String getCode() {
-    return this.code;
+
+  public int getId() {
+    return this.id;
   }
 
   public String getName() {
@@ -33,8 +37,12 @@ public class ManufactureCountry {
     return this.image;
   }
 
-  public void setCode(String code) {
-    this.code = code;
+  public Category getCategory() {
+    return this.category;
+  }
+
+  public void setId(int id) {
+    this.id = id;
   }
 
   public void setName(String name) {
@@ -43,6 +51,10 @@ public class ManufactureCountry {
 
   public void setImage(Image image) {
     this.image = image;
+  }
+
+  public void setCategory(Category category) {
+    this.category = category;
   }
 }
 

@@ -20,6 +20,7 @@ import org.nhomkinh.hoangtuan.web.customer.model.DimensionUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.ProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.ManufacturedProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.model.CustomizedCutProductUnit;
+import org.nhomkinh.hoangtuan.web.customer.model.Image;
 
 
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductVNRepository;
@@ -92,6 +93,10 @@ public class HtmlController {
     for (Product product : products) {
       msg += product.getCode() + ":";
       msg += "\n\tOrigin -> " + product.getOrigin().getCode();
+          msg += " " + (product.getOrigin().getImage() == null ? "null" : product.getOrigin().getImage().getUri());
+      for (Image img : product.getImages()) {
+          msg += "\n\t" + img.getUri();
+      }
       for (Price price : product.getPrices()) {
           msg += "\n\t" + price.getDate().getTime();
       }
@@ -126,6 +131,10 @@ public class HtmlController {
         for(int i = 0; i < codes.length; i++) {
             ManufactureCountry mc = new ManufactureCountry();
             mc.setCode(codes[i]);
+            Image img = new Image();
+            img.setUri("http://www.mc.com/img" + i);
+            if (i % 2 == 0)
+              mc.setImage(img);
             originRepository.save(mc);
         }
       }
@@ -193,6 +202,10 @@ public class HtmlController {
             //v.setProduct(p);
             v.setUnitId(8 + j);
             p.getPrices().add(v);
+
+            Image img = new Image();
+            img.setUri("https://abc/" + j);
+            p.getImages().add(img);
         }
         rep.save(p);
       }
