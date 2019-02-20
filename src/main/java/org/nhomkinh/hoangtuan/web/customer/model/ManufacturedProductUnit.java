@@ -4,6 +4,10 @@ package org.nhomkinh.hoangtuan.web.customer.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
 
 
 @Entity
@@ -13,6 +17,16 @@ public class ManufacturedProductUnit extends ProductUnit {
   private int id;
 
   private int value;
+
+  @ManyToOne(
+    optional = false,
+    fetch = FetchType.EAGER,
+    cascade = {
+      CascadeType.REFRESH, CascadeType.DETACH
+    }
+  )
+  @JoinColumn
+  private DimensionUnit dimensionUnit;
 
 
   @Override
@@ -24,6 +38,10 @@ public class ManufacturedProductUnit extends ProductUnit {
     return this.value;
   }
 
+  public DimensionUnit getDimensionUnit() {
+    return this.dimensionUnit;
+  }
+
   @Override
   public void setId(int id) {
     this.id = id;
@@ -31,6 +49,10 @@ public class ManufacturedProductUnit extends ProductUnit {
 
   public void setValue(int value) {
     this.value = value;
+  }
+
+  public void setDimensionUnit(DimensionUnit dimensionUnit) {
+    this.dimensionUnit = dimensionUnit;
   }
 }
 

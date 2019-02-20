@@ -4,6 +4,10 @@ package org.nhomkinh.hoangtuan.web.customer.model;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.PrimaryKeyJoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.FetchType;
+import javax.persistence.CascadeType;
+import javax.persistence.JoinColumn;
 
 
 @Entity
@@ -15,6 +19,17 @@ public class CustomizedCutProductUnit extends ProductUnit {
   private int minValue;
 
   private int maxValue;
+
+  @ManyToOne(
+    optional=false,
+    fetch = FetchType.EAGER,
+    cascade = {
+      CascadeType.REFRESH,
+      CascadeType.DETACH
+    }
+  )
+  @JoinColumn
+  private DimensionUnit dimensionUnit;
 
 
   @Override
@@ -30,6 +45,10 @@ public class CustomizedCutProductUnit extends ProductUnit {
     return this.maxValue;
   }
 
+  public DimensionUnit getDimensionUnit() {
+    return this.dimensionUnit;
+  }
+
   @Override
   public void setId(int id) {
     this.id = id;
@@ -41,6 +60,10 @@ public class CustomizedCutProductUnit extends ProductUnit {
 
   public void setMaxValue(int maxValue) {
     this.maxValue = maxValue;
+  }
+
+  public void setDimensionUnit(DimensionUnit dimensionUnit) {
+    this.dimensionUnit = dimensionUnit;
   }
 }
 
