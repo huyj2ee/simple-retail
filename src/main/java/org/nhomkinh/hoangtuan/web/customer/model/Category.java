@@ -3,6 +3,7 @@ package org.nhomkinh.hoangtuan.web.customer.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
@@ -23,9 +24,12 @@ public class Category {
   @JoinColumn
   private Image image;
 
-  @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+  @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
   @JoinColumn
   private Category parentCategory;
+
+  @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy="parentCategory")
+  private Set<Category> categories;
 
   @OneToMany(
     fetch = FetchType.EAGER,
@@ -40,6 +44,7 @@ public class Category {
 
   public Category() {
     this.products = new HashSet<Product>();
+    this.categories = new HashSet<Category>();
   }
 
   public int getId() {
@@ -56,6 +61,10 @@ public class Category {
 
   public Category getParentCategory() {
     return this.parentCategory;
+  }
+
+  public Set<Category> getCategories() {
+    return this.categories;
   }
 
   public Set<Product> getProducts() {
@@ -76,6 +85,11 @@ public class Category {
 
   public void setParentCategory(Category parentCategory) {
     this.parentCategory = parentCategory;
+  }
+
+  public void setCategories(Set<Category> categories) {
+    this.categories.retainAll(categories);
+    this.categories.addAll(categories);
   }
 
   public void setProducts(Set<Product> products) {
