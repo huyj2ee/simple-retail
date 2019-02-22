@@ -1,0 +1,75 @@
+<html>
+  <head>
+    <title>Home Page</title>
+  </head>
+  <body>
+    <h1>Hello</h1>
+
+    <nav th:unless="${links}==null">
+      <a th:each="link, iterStat: ${links}" th:href="${link.link}" th:text="${link.label} + (${iterStat.last} ? '' : ' > ')"/>
+    </nav>
+
+    <table th:unless="${categories}==null">
+      <thead>
+        <tr>
+          <th>Icon</th>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Link</th>
+        </tr>
+        </thead>
+      <tbody>
+        <tr th:each="cat : ${categories}">
+          <td>
+            <div th:unless="${cat.image}==null">
+              <div th:text="${cat.image.uri}" />
+            </div>
+            <div th:if="${cat.image}==null">
+              no icon
+            </div>
+          </td>
+          <td th:text="${cat.id}"/>
+          <td th:text="${cat.name}"/>
+          <td>
+            <a th:href="'/category?cat=' + ${cat.id}">detail</a>
+          </td>
+        </tr>
+      </tbody>
+      <!-- tfoot>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+      </tfoot -->
+    </table>
+
+    <table th:unless="${products}==null">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Name</th>
+          <th>Link</th>
+        </tr>
+        </thead>
+      <tbody>
+        <tr th:each="product : ${products}">
+          <td th:text="${product.code}"/>
+          <td th:text="${product.name}"/>
+          <td>
+            <a th:href="'/productdbg?code=' + ${product.code}">detail</a>
+          </td>
+        </tr>
+      </tbody>
+      <!-- tfoot>
+        <tr>
+          <td>A</td>
+          <td>B</td>
+          <td>C</td>
+        </tr>
+      </tfoot -->
+    </table>
+
+  </body>
+</html>
+

@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.ui.Model;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.nhomkinh.hoangtuan.web.customer.NavigationLink;
 import org.nhomkinh.hoangtuan.web.customer.model.Category;
 import org.nhomkinh.hoangtuan.web.customer.model.Product;
 import org.nhomkinh.hoangtuan.web.customer.model.Price;
@@ -19,12 +20,16 @@ import org.nhomkinh.hoangtuan.web.customer.repository.CategoryRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductUnitRepository;
 import java.util.function.Consumer;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.ArrayList;
 import org.phamsodiep.utils.MultiLocaleDAO;
 import org.phamsodiep.utils.Language;
 
 
 @Controller
 public class CustomerController {
+  private static final NavigationLink homeLink = new NavigationLink("/category", "Home");
+
   @Autowired
   private CategoryRepository categoryRepository;
 
@@ -43,6 +48,53 @@ public class CustomerController {
     productRepositories[Language.EN.ordinal()] = enRep;
     this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
       MultiLocaleDAO.getInstance(Product.class,productRepositories);
+  }
+
+  @GetMapping("/category")
+  public String categoryPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = "VN"
+    ) String lang,
+    @RequestParam(
+      value = "cat",
+      required = false,
+      defaultValue = ""
+    ) String catCode,
+    Model model
+  ) {
+    Collection<Category> categories = null;
+    Collection<Product> products = null;
+    Collection<NavigationLink> links = null;
+    try {
+      try {
+        Integer catId = new Integer(catCode);
+        Category cat = this.categoryRepository.findById(catId).orElse(null);
+        links = this.retrieveNavigationLinks(cat);
+        categories = cat.getCategories();
+        products = cat.getProducts();
+        if (products.size() == 0) {
+          products = null;
+        }
+      }
+      catch(NumberFormatException e) {
+        categories = this.categoryRepository.findAllTopLevelCategories();
+      }
+      if (categories.size() == 0) {
+        categories = null;
+      }
+    }
+    catch(DataAccessException daoException) {
+      categories = null;
+    }
+    if (links == null) {
+      links = this.retrieveNavigationLinks(null);
+    }
+    model.addAttribute("links", links);
+    model.addAttribute("categories", categories);
+    model.addAttribute("products", products);
+    return "category";
   }
 
   @GetMapping("/categorydbg")
@@ -175,6 +227,23 @@ public class CustomerController {
       debugMsg.append("\n\t\t\t");
       debugMsg.append(pu.getDescription());
     }
+  }
+
+  private static Collection<NavigationLink> retrieveNavigationLinks(Category category) {
+    ArrayList<NavigationLink> result = new ArrayList<NavigationLink>();
+    for (
+      Category pCategory = category;
+      pCategory != null;
+      pCategory = pCategory.getParentCategory()
+    ) {
+      NavigationLink link = new NavigationLink();
+      link.setLink("/category?cat=" + pCategory.getId());
+      link.setLabel(pCategory.getName());
+      result.add(link);
+    }
+    result.add(homeLink);
+    Collections.reverse(result);
+    return result;
   }
 }
 
