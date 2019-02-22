@@ -140,6 +140,10 @@ public class CustomerController {
   }
 
   private void debugTraceProduct(StringBuffer debugMsg, Product p) {
+    if (p == null) {
+      debugMsg.append("not found");
+      return;
+    }
     debugMsg.append("\n\t\t");
     debugMsg.append(p.getCode());
     debugMsg.append("\n\t\t");
