@@ -1,0 +1,13 @@
+<div
+  th:fragment="horizontal_navigation (objname)"
+  th:with="links=${__${objname}__}"
+  th:unless="${__${objname}__}==null"
+>
+  <nav th:unless="${links}==null">
+    <span th:each="link, iterStat: ${links}">
+      <a th:href="${link.link}" th:text="${link.label}"/>
+      <span th:text="${iterStat.last} ? '' : ' > '">
+    </span>
+  </nav>
+</div>
+

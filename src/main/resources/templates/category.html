@@ -1,21 +1,19 @@
 <html>
   <head>
-    <title>Home Page</title>
+    <title>Nhôm kính Hoàng Tuấn</title>
   </head>
   <body>
-    <h1>Hello</h1>
+    <h1>Danh mục</h1>
 
-    <nav th:unless="${links}==null">
-      <a th:each="link, iterStat: ${links}" th:href="${link.link}" th:text="${link.label} + (${iterStat.last} ? '' : ' > ')"/>
-    </nav>
+    <div th:insert="fragments/navigation :: horizontal_navigation('links')">navigation menu</div>
 
     <table th:unless="${categories}==null">
       <thead>
         <tr>
-          <th>Icon</th>
-          <th>Code</th>
-          <th>Name</th>
-          <th>Link</th>
+          <th>Biểu tượng</th>
+          <th>Mã số</th>
+          <th>Tên gọi</th>
+          <th>Liên kết</th>
         </tr>
         </thead>
       <tbody>
@@ -25,13 +23,13 @@
               <div th:text="${cat.image.uri}" />
             </div>
             <div th:if="${cat.image}==null">
-              no icon
+              không
             </div>
           </td>
           <td th:text="${cat.id}"/>
           <td th:text="${cat.name}"/>
           <td>
-            <a th:href="'/category?cat=' + ${cat.id}">detail</a>
+            <a th:href="'/?cat=' + ${cat.id}">chi tiết</a>
           </td>
         </tr>
       </tbody>
@@ -47,9 +45,9 @@
     <table th:unless="${products}==null">
       <thead>
         <tr>
-          <th>Code</th>
-          <th>Name</th>
-          <th>Link</th>
+          <th>Mã số</th>
+          <th>Tên gọi</th>
+          <th>Liên kết</th>
         </tr>
         </thead>
       <tbody>
@@ -57,7 +55,7 @@
           <td th:text="${product.code}"/>
           <td th:text="${product.name}"/>
           <td>
-            <a th:href="'/productdbg?code=' + ${product.code}">detail</a>
+            <a th:href="'/productdbg?code=' + ${product.code}">chi tiết</a>
           </td>
         </tr>
       </tbody>

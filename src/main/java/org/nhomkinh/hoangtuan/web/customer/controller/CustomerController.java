@@ -28,7 +28,7 @@ import org.phamsodiep.utils.Language;
 
 @Controller
 public class CustomerController {
-  private static final NavigationLink homeLink = new NavigationLink("/category", "Home");
+  private static final NavigationLink homeLink = new NavigationLink("/", "Home");
 
   @Autowired
   private CategoryRepository categoryRepository;
@@ -50,7 +50,7 @@ public class CustomerController {
       MultiLocaleDAO.getInstance(Product.class,productRepositories);
   }
 
-  @GetMapping("/category")
+  @GetMapping("/")
   public String categoryPage(
     @RequestParam(
       value = "lang",
@@ -271,7 +271,7 @@ public class CustomerController {
       pCategory = pCategory.getParentCategory()
     ) {
       NavigationLink link = new NavigationLink();
-      link.setLink("/category?cat=" + pCategory.getId());
+      link.setLink("?cat=" + pCategory.getId());
       link.setLabel(pCategory.getName());
       result.add(link);
     }

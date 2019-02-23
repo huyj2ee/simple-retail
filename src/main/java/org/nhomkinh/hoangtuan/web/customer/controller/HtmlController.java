@@ -81,7 +81,7 @@ public class HtmlController {
     );
   }
 
-  @GetMapping("/")
+  @GetMapping("/homepage")
   public String homePage(
     @RequestParam(
       value = "lang",
