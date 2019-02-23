@@ -64,6 +64,7 @@ public abstract class Product {
 
   public Product() {
     this.prices = new HashSet<Price>();
+    this.units = new HashSet<ProductUnit>();
     this.images = new HashSet<Image>();
   }
 
@@ -83,6 +84,10 @@ public abstract class Product {
 
   public Set<Price> getPrices() {
     return this.prices;
+  }
+
+  public Set<ProductUnit> getUnits() {
+    return this.units;
   }
 
   public Set<Image> getImages() {
@@ -110,6 +115,11 @@ public abstract class Product {
   public void setPrices(Set<Price> prices) {
     this.prices.retainAll(prices);
     this.prices.addAll(prices);
+  }
+
+  public void setUnits(Set<ProductUnit> units) {
+    this.units.retainAll(units);
+    this.units.addAll(units);
   }
 
   public void setImages(Set<Image> images) {

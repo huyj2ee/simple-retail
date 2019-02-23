@@ -196,37 +196,71 @@ public class CustomerController {
       debugMsg.append("not found");
       return;
     }
-    debugMsg.append("\n\t\t");
+    // Retrieve systemCategory
+    Category sectCat = p.getCategory();
+    // Retrieve sectionCategory
+    Category sysCat = sectCat.getParentCategory();
+    debugMsg.append("\nSystem: ");
+    if (sysCat != null) {
+      debugMsg.append(sysCat.getName());
+    }
+    else {
+      debugMsg.append("unknown");
+    }
+    debugMsg.append("\nSection: ");
+      debugMsg.append(sectCat.getName());
+
+    debugMsg.append("\n\tCode: ");
     debugMsg.append(p.getCode());
-    debugMsg.append("\n\t\t");
+    debugMsg.append("\n\tName: ");
     debugMsg.append(p.getName());
-    debugMsg.append("\n\t\t");
+    debugMsg.append("\n\tBrief (Dimention information): ");
     debugMsg.append(p.getBrief());
-    debugMsg.append("\n\t\t");
+    debugMsg.append("\n\tOrigin: ");
+    debugMsg.append(p.getOrigin().getCode() + "/" + p.getOrigin().getName());
+    debugMsg.append("\n\tDescription: ");
     debugMsg.append(p.getDescription());
-    debugMsg.append("\n\t\t");
+    debugMsg.append("\n\tDimentions: ");
+
+    for (ProductUnit pu : p.getUnits()) {
+        debugMsg.append("[");
+        debugMsg.append(pu.getId());
+        debugMsg.append("-");
+        debugMsg.append(pu.getName());
+        debugMsg.append("-");
+        debugMsg.append(pu.getCaption());
+        debugMsg.append("-");
+        debugMsg.append(pu.getDescription());
+        debugMsg.append("],  ");
+    }
+
+    debugMsg.append("\n\tPrices:");
+    for (Price price : p.getPrices()) {
+      ProductUnit pu = this.productUnitRepository.findById(price.getUnitId()).orElse(null);
+      if (pu != null) {
+        debugMsg.append("\n\t\t");
+        debugMsg.append(pu.getId());
+        debugMsg.append(", ");
+        debugMsg.append(pu.getName());
+        debugMsg.append(", ");
+        debugMsg.append(pu.getCaption());
+        debugMsg.append(", ");
+        debugMsg.append(pu.getDescription());
+        debugMsg.append(": ");
+      }
+      debugMsg.append(price.getValue());
+      debugMsg.append(" at time ");
+      debugMsg.append(price.getDate().getTime());
+    }
+
+    debugMsg.append("\n\tNote: ");
     debugMsg.append((p.getNote() == null ? "[!]" : p.getNote()));
-    debugMsg.append("\n\t\t");
-    debugMsg.append(p.getOrigin().getCode() + ":" + p.getOrigin().getName());
+    debugMsg.append("\n\tSome images:");
     for (Image img : p.getImages()) {
-      debugMsg.append("\n\t\t\t");
+      debugMsg.append("\n\t\t");
       debugMsg.append(img.getUri());
     }
-    for (Price price : p.getPrices()) {
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append(price.getValue());
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append("time: " + price.getDate().getTime());
-      ProductUnit pu = this.productUnitRepository.findById(price.getUnitId()).orElse(null);
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append(pu.getId());
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append(pu.getName());
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append(pu.getCaption());
-      debugMsg.append("\n\t\t\t");
-      debugMsg.append(pu.getDescription());
-    }
+    debugMsg.append("\n");
   }
 
   private static Collection<NavigationLink> retrieveNavigationLinks(Category category) {
