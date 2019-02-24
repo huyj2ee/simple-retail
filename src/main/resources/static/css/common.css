@@ -1,0 +1,43 @@
+div.header {
+  width: 100%;
+  background-color: lightblue;
+}
+
+div.horizontal_menu {
+  width: 100%;
+  background-color: lightblue;
+}
+
+div.mainbody {
+  display: flex;
+}
+
+div.footer {
+  text-align: center;
+  font-size: 12px;"
+}
+
+@media screen and (max-height: 1024px) {
+  div.vertical_menu {
+    min-height: 424px;
+    width: 170px;
+    background-color: lightblue;
+  }
+}
+
+@media screen and (max-height: 768px) {
+  div.vertical_menu {
+    min-height: 268px;
+    width: 170px;
+    background-color: lightblue;
+  }
+}
+
+@media screen and (max-height: 480px) {
+  div.vertical_menu {
+    min-height: 80px;
+    width: 170px;
+    background-color: lightblue;
+  }
+}
+

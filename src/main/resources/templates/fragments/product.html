@@ -1,0 +1,44 @@
+<div
+  th:fragment="list (products_name)"
+  th:with="products=${__${products_name}__}"
+  th:unless="${__${products_name}__}==null"
+>
+  <table th:unless="${products}==null">
+    <thead>
+      <tr>
+        <th>Mã số</th>
+        <th>Tên gọi</th>
+        <th>Liên kết</th>
+      </tr>
+      </thead>
+    <tbody>
+      <tr th:each="product : ${products}">
+        <td th:text="${product.code}"/>
+        <td th:text="${product.name}"/>
+        <td>
+          <a th:href="'/product?code=' + ${product.code}">chi tiết</a>
+        </td>
+      </tr>
+    </tbody>
+    <!-- tfoot>
+      <tr>
+        <td>A</td>
+        <td>B</td>
+        <td>C</td>
+      </tr>
+    </tfoot -->
+  </table>
+</div>
+
+<div
+  th:fragment="show (product_name)"
+  th:with="product=${__${product_name}__}"
+  th:unless="${__${product_name}__}==null"
+>
+  <div th:text="${product.code}"/>
+  <div th:text="${product.name}"/>
+  <div>
+    <a th:href="'/product?code=' + ${product.code}">chi tiết</a>
+  </div>
+</div>
+

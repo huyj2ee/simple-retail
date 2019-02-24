@@ -1,0 +1,41 @@
+<div
+  th:fragment="list (category_name)"
+  th:with="categories=${__${category_name}__}"
+  th:unless="${__${category_name}__}==null"
+>
+  <table th:unless="${categories}==null">
+    <thead>
+      <tr>
+        <th>Biểu tượng</th>
+        <th>Mã số</th>
+        <th>Tên gọi</th>
+        <th>Liên kết</th>
+      </tr>
+      </thead>
+    <tbody>
+      <tr th:each="cat : ${categories}">
+        <td>
+          <div th:unless="${cat.image}==null">
+            <div th:text="${cat.image.uri}" />
+          </div>
+          <div th:if="${cat.image}==null">
+            không
+          </div>
+        </td>
+        <td th:text="${cat.id}"/>
+        <td th:text="${cat.name}"/>
+        <td>
+          <a th:href="'/?cat=' + ${cat.id}">chi tiết</a>
+        </td>
+      </tr>
+    </tbody>
+    <!-- tfoot>
+      <tr>
+        <td>A</td>
+        <td>B</td>
+        <td>C</td>
+      </tr>
+    </tfoot -->
+  </table>
+</div>
+

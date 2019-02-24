@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/common.css" />
+  </head>
+  <body>
+    <header>
+      <div class="header">
+        <img
+          src="/img/untitled_company.jpg"
+          border="0"
+          data-original-width="432"
+          data-original-height="274"
+          width="216"
+          height="137"
+        />
+      </div>
+      <div class="horizontal_menu">
+        <i>&lt;Menu ngang - chưa thiết kế&gt;</i>
+      </div>
+    </header>
+
+    <div class="mainbody">
+      <div class="vertical_menu">
+        <i><div>&lt;Mục 1 - chưa thiết kế&gt;</div></i>
+        <i><div>&lt;Mục 2 - chưa thiết kế&gt;</div></i>
+        <i><div>&lt;Mục 3 - chưa thiết kế&gt;</div></i>
+      </div>
+      <div>
+        <div th:insert="fragments/navigation :: horizontal_navigation('links')">navigation menu</div>
+        <main>
+          <div th:if="${product} == null">
+            <div th:insert="fragments/category :: list('categories')">category list</div>
+            <div th:insert="fragments/product :: list('products')">product list</div>
+          </div>
+          <div th:unless="${product} == null">
+            <div th:insert="fragments/product :: show('product')">product</div>
+          </div>
+
+          <!--section>
+            &nbsp;
+          </section-->
+          <!--aside>
+            aside
+          </aside-->
+        </main>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer">
+        <p>Doanh Nghiệp Tư Nhân Hoàng Tuấn</p>
+        <p>Địa chỉ: 1320 Đại lộ Bình Dương, Định Hoà, Thủ Dầu Một, Bình Dương</p>
+        <p>Email: <a href="mailto:buianhtuan.nhomkinh@gmail">buianhtuan.nhomkinh@gmail</a></p>
+      </div>
+    </footer>
+  </body>
+</html>
+

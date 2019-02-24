@@ -71,7 +71,7 @@ public class CustomerController {
       try {
         Integer catId = new Integer(catCode);
         Category cat = this.categoryRepository.findById(catId).orElse(null);
-        links = this.retrieveNavigationLinks(cat);
+        links = CustomerController.retrieveNavigationLinks(cat);
         categories = cat.getCategories();
         products = cat.getProducts();
         if (products.size() == 0) {
@@ -89,13 +89,45 @@ public class CustomerController {
       categories = null;
     }
     if (links == null) {
-      links = this.retrieveNavigationLinks(null);
+      links = Collections.singletonList(homeLink);
     }
     model.addAttribute("links", links);
     model.addAttribute("categories", categories);
     model.addAttribute("products", products);
-    return "category";
+    return "layout_a";
   }
+
+  @GetMapping("/product")
+  public String productPage(
+    @RequestParam(
+      value = "lang",
+      required = false,
+      defaultValue = "VN"
+    ) String lang,
+    @RequestParam(
+      value = "code",
+      required = false,
+      defaultValue = ""
+    ) String code,
+    Model model
+  ) {
+    Collection<NavigationLink> links = null;
+    ProductRepository<Product> productRepository =
+      this.multiLocaleDAO.getRepository(lang);
+
+    Product product = null;
+    try {
+      product = productRepository.findById(code).orElse(null);
+      links = CustomerController.retrieveNavigationLinks(product);
+    }
+    catch(DataAccessException daoException) {
+      product = null;
+    }
+    model.addAttribute("links", links);
+    model.addAttribute("product", product);
+    return "layout_a";
+  }
+
 
   @GetMapping("/categorydbg")
   public String categoryPageDbg(
@@ -149,7 +181,8 @@ public class CustomerController {
         cat.getCategories().forEach(printCategoryProc);
       }
       else {
-        Collection<Category> categories = this.categoryRepository.findAllTopLevelCategories();
+        Collection<Category> categories = this.categoryRepository
+          .findAllTopLevelCategories();
         debugMsg.append("\nRoot category list:");
         categories.forEach(printCategoryProc);
       }
@@ -176,7 +209,8 @@ public class CustomerController {
     Model model
   ) {
     StringBuffer debugMsg = new StringBuffer();
-    ProductRepository<Product> productRepository = this.multiLocaleDAO.getRepository(lang);
+    ProductRepository<Product> productRepository =
+      this.multiLocaleDAO.getRepository(lang);
 
     try {
       Product product = productRepository.findById(code).orElse(null);
@@ -236,7 +270,8 @@ public class CustomerController {
 
     debugMsg.append("\n\tPrices:");
     for (Price price : p.getPrices()) {
-      ProductUnit pu = this.productUnitRepository.findById(price.getUnitId()).orElse(null);
+      ProductUnit pu = this.productUnitRepository.findById(price.getUnitId())
+        .orElse(null);
       if (pu != null) {
         debugMsg.append("\n\t\t");
         debugMsg.append(pu.getId());
@@ -263,7 +298,9 @@ public class CustomerController {
     debugMsg.append("\n");
   }
 
-  private static Collection<NavigationLink> retrieveNavigationLinks(Category category) {
+  private static Collection<NavigationLink> retrieveNavigationLinks(
+    Category category
+  ) {
     ArrayList<NavigationLink> result = new ArrayList<NavigationLink>();
     for (
       Category pCategory = category;
@@ -271,12 +308,24 @@ public class CustomerController {
       pCategory = pCategory.getParentCategory()
     ) {
       NavigationLink link = new NavigationLink();
-      link.setLink("?cat=" + pCategory.getId());
+      link.setLink("/?cat=" + pCategory.getId());
       link.setLabel(pCategory.getName());
       result.add(link);
     }
     result.add(homeLink);
     Collections.reverse(result);
+    return result;
+  }
+
+  private static Collection<NavigationLink> retrieveNavigationLinks(
+    Product product
+  ) {
+    Collection<NavigationLink> result =
+      CustomerController.retrieveNavigationLinks(product.getCategory());
+    NavigationLink productLink = new NavigationLink();
+    productLink.setLink("/product?code=" + product.getCode());
+    productLink.setLabel(product.getName());
+    result.add(productLink);
     return result;
   }
 }
