@@ -15,15 +15,12 @@ import org.nhomkinh.hoangtuan.web.customer.model.Image;
 import org.nhomkinh.hoangtuan.web.customer.model.ProductUnit;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductVNRepository;
-import org.nhomkinh.hoangtuan.web.customer.repository.ProductENRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.CategoryRepository;
 import org.nhomkinh.hoangtuan.web.customer.repository.ProductUnitRepository;
 import java.util.function.Consumer;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ArrayList;
-import org.phamsodiep.utils.MultiLocaleDAO;
-import org.phamsodiep.utils.Language;
 
 
 @Controller
@@ -36,18 +33,13 @@ public class CustomerController {
   @Autowired
   private ProductUnitRepository productUnitRepository;
 
-  private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
+  private ProductRepository productRepository;
 
 
   public CustomerController(
-    @Autowired ProductVNRepository vnRep,
-    @Autowired ProductENRepository enRep
+    @Autowired ProductVNRepository vnRep
   ) {
-    ProductRepository[] productRepositories = new ProductRepository[Language.COUNT.ordinal()];
-    productRepositories[Language.VN.ordinal()] = vnRep;
-    productRepositories[Language.EN.ordinal()] = enRep;
-    this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
-      MultiLocaleDAO.getInstance(Product.class,productRepositories);
+    this.productRepository = vnRep;
   }
 
   @GetMapping("/")
@@ -112,12 +104,10 @@ public class CustomerController {
     Model model
   ) {
     Collection<NavigationLink> links = null;
-    ProductRepository<Product> productRepository =
-      this.multiLocaleDAO.getRepository(lang);
 
     Product product = null;
     try {
-      product = productRepository.findById(code).orElse(null);
+      product = (Product)this.productRepository.findById(code).orElse(null);
       links = CustomerController.retrieveNavigationLinks(product);
     }
     catch(DataAccessException daoException) {
@@ -209,11 +199,8 @@ public class CustomerController {
     Model model
   ) {
     StringBuffer debugMsg = new StringBuffer();
-    ProductRepository<Product> productRepository =
-      this.multiLocaleDAO.getRepository(lang);
-
     try {
-      Product product = productRepository.findById(code).orElse(null);
+      Product product = (Product)productRepository.findById(code).orElse(null);
       this.debugTraceProduct(debugMsg, product);
     }
     catch(DataAccessException daoException) {
