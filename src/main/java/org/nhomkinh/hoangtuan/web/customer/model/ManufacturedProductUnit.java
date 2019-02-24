@@ -43,6 +43,13 @@ public class ManufacturedProductUnit extends ProductUnit {
   }
 
   @Override
+  public String getFullName() {
+    return this.getName()
+      + " " + this.getValue()
+      + " " + this.getDimensionUnit().getName();
+  }
+
+  @Override
   public void setId(int id) {
     this.id = id;
   }

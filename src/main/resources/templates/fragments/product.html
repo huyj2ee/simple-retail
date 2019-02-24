@@ -35,10 +35,72 @@
   th:with="product=${__${product_name}__}"
   th:unless="${__${product_name}__}==null"
 >
-  <div th:text="${product.code}"/>
-  <div th:text="${product.name}"/>
-  <div>
-    <a th:href="'/product?code=' + ${product.code}">chi tiết</a>
+  <h1 th:text="'Phân loại ' + ${product.category.parentCategory.name}"
+    th:unless="${product.category.parentCategory} == null"
+  />
+  <h2 th:text="'Hệ ' + ${product.category.name} + ': sản phẩm ' + ${product.name}" />
+  <hr />
+  <h3 th:text="'Mẫu ' + ${product.code}"/>
+  <div>&nbsp;</div>
+  <div style="text-align: center;">
+    <img src="img/rf001ds.png" />
+  </div>
+  <div class="product_information">
+    <div>
+      <div>Mã số:</div>
+      <div th:text="${product.code}"/>
+    </div>
+    <div>
+      <div>Tên gọi:</div>
+      <div th:text="${product.name}"/>
+    </div>
+    <div>
+      <div>Kích thước mặt cắt:</div>
+      <div th:text="${product.brief}"/>
+    </div>
+    <div>
+      <div>Xuất xứ:</div>
+      <div th:text="${product.origin.name}"/>
+    </div>
+    <div>
+      <div>Mô tả:</div>
+      <div th:text="${product.description}" style="width:auto;"/>
+    </div>
+    <div>
+      <div>Kích thước sản phẩm:</div>
+      <span th:each="unit, stat: ${product.units}">
+        <span th:text="${unit.fullName}" />
+        <span th:text="${stat.last} ? '' : ', '">
+      </span>
+    </div>
+    <div>
+      <div>Giá:</div>
+      <div>
+        <span th:each="price: ${product.prices}">
+          <b th:text="'Kích thước ' + ${price.unitId} + ':'"/>
+          &nbsp;
+          <span th:text="${price.value} + ' đồng'"/>
+          <br />
+        </span>
+      </div>
+    </div>
+    <div>
+      <div>Một số hình ảnh:</div>
+      <div>&nbsp;</div>
+    </div>
+    <div>&nbsp;</div>
+    <div style="display: inline-block;">
+      <img
+        src="img/rf001.jpg"
+        width="320"
+        height="240"
+      />
+      <img
+        src="img/rf002.jpg"
+        width="320"
+        height="240"
+      />
+    </div>
   </div>
 </div>
 

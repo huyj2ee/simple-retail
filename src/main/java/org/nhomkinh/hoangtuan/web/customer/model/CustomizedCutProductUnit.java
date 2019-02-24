@@ -50,6 +50,14 @@ public class CustomizedCutProductUnit extends ProductUnit {
   }
 
   @Override
+  public String getFullName() {
+    return this.getName()
+      + " " + this.getMinValue()
+      + "-" + this.getMaxValue()
+      + " " + this.getDimensionUnit().getName();
+  }
+
+  @Override
   public void setId(int id) {
     this.id = id;
   }

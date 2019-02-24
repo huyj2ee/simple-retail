@@ -17,10 +17,23 @@ div.footer {
   font-size: 12px;"
 }
 
+div.product_information > div {
+  display: flex;
+}
+
+div.product_information > div > div:first-child {
+  width: 220px;
+  min-width: 220px;
+  max-width: 220px;
+  font-weight: bold;
+}
+
 @media screen and (max-height: 1024px) {
   div.vertical_menu {
     min-height: 424px;
-    width: 170px;
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
     background-color: lightblue;
   }
 }
@@ -28,7 +41,9 @@ div.footer {
 @media screen and (max-height: 768px) {
   div.vertical_menu {
     min-height: 268px;
-    width: 170px;
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
     background-color: lightblue;
   }
 }
@@ -36,7 +51,9 @@ div.footer {
 @media screen and (max-height: 480px) {
   div.vertical_menu {
     min-height: 80px;
-    width: 170px;
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
     background-color: lightblue;
   }
 }

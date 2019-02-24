@@ -242,7 +242,7 @@ public class CustomerController {
       debugMsg.append("unknown");
     }
     debugMsg.append("\nSection: ");
-      debugMsg.append(sectCat.getName());
+    debugMsg.append(sectCat.getName());
 
     debugMsg.append("\n\tCode: ");
     debugMsg.append(p.getCode());
@@ -257,15 +257,15 @@ public class CustomerController {
     debugMsg.append("\n\tDimentions: ");
 
     for (ProductUnit pu : p.getUnits()) {
-        debugMsg.append("[");
-        debugMsg.append(pu.getId());
-        debugMsg.append("-");
-        debugMsg.append(pu.getName());
-        debugMsg.append("-");
-        debugMsg.append(pu.getCaption());
-        debugMsg.append("-");
-        debugMsg.append(pu.getDescription());
-        debugMsg.append("],  ");
+      debugMsg.append("[");
+      debugMsg.append(pu.getId());
+      debugMsg.append("-");
+      debugMsg.append(pu.getName());
+      debugMsg.append("-");
+      debugMsg.append(pu.getCaption());
+      debugMsg.append("-");
+      debugMsg.append(pu.getDescription());
+      debugMsg.append("],  ");
     }
 
     debugMsg.append("\n\tPrices:");
@@ -277,6 +277,8 @@ public class CustomerController {
         debugMsg.append(pu.getId());
         debugMsg.append(", ");
         debugMsg.append(pu.getName());
+        debugMsg.append(", ");
+        debugMsg.append(pu.getFullName());
         debugMsg.append(", ");
         debugMsg.append(pu.getCaption());
         debugMsg.append(", ");

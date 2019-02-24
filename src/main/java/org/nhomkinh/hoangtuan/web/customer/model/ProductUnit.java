@@ -30,6 +30,10 @@ public class ProductUnit implements Unit {
     return this.name;
   }
 
+  public String getFullName() {
+    return this.name;
+  }
+
   public String getCaption() {
     return this.caption;
   }

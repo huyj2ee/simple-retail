@@ -39,8 +39,8 @@ import java.util.Calendar;
 import java.sql.Date;
 
 
-import org.phamsodiep.utils.Language;
-import org.phamsodiep.utils.MultiLocaleDAO;
+//////import org.phamsodiep.utils.Language;
+//////import org.phamsodiep.utils.MultiLocaleDAO;
 
 
 @Controller
@@ -54,7 +54,8 @@ public class HtmlController {
   @Autowired
   private ProductUnitRepository productUnitRepository;
 
-  private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
+//////  private MultiLocaleDAO<ProductRepository, Product> multiLocaleDAO;
+  private ProductRepository[] productRepositories;
 
   private InheritanceDAO<UnitRepository, Unit> inheritanceDAO;
 
@@ -67,11 +68,15 @@ public class HtmlController {
     @Autowired ManufacturedProductUnitRepository manufacturedProductUnitRepository,
     @Autowired CustomizedCutProductUnitRepository customizedCutProductUnitRepository
   ) {
-    ProductRepository[] productRepositories = new ProductRepository[Language.COUNT.ordinal()];
-    productRepositories[Language.VN.ordinal()] = vnRep;
-    productRepositories[Language.EN.ordinal()] = enRep;
-    this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
-      MultiLocaleDAO.getInstance(Product.class,productRepositories);
+//////    ProductRepository[] productRepositories = new ProductRepository[Language.COUNT.ordinal()];
+//////    productRepositories[Language.VN.ordinal()] = vnRep;
+//////    productRepositories[Language.EN.ordinal()] = enRep;
+//////    this.multiLocaleDAO = (MultiLocaleDAO<ProductRepository, Product>)
+//////      MultiLocaleDAO.getInstance(Product.class,productRepositories);
+
+    productRepositories = new ProductRepository[2];
+    productRepositories[0] = vnRep;
+    productRepositories[1] = enRep;
 
     this.inheritanceDAO = new InheritanceDAO<UnitRepository, Unit>(
       DimensionUnit.class, dimensionUnitRepository,
@@ -81,7 +86,7 @@ public class HtmlController {
     );
   }
 
-  @GetMapping("/homepage")
+/*  @GetMapping("/homepage")
   public String homePage(
     @RequestParam(
       value = "lang",
@@ -118,42 +123,9 @@ public class HtmlController {
 
     model.addAttribute("appName", msg);
     return "index";
-  }
+  }*/
 
-  private String populateManufactureCountry() {
-    String[] codes = {
-      "vn",
-      "tw",
-      "cn"
-    };
-    String msg = "";
-    // In case there is no ManufactureCountry, populate it
-    try {
-      Iterable<ManufactureCountry> iter = originRepository.findAll();
-      int n = 0;
-      for (ManufactureCountry o : iter) {
-          n++;
-      }
-      if (n == 0) {
-        msg += "No ManufactureCountry found, popupate some data...\n";
-        for(int i = 0; i < codes.length; i++) {
-            ManufactureCountry mc = new ManufactureCountry();
-            mc.setCode(codes[i]);
-            Image img = new Image();
-            img.setUri("http://www.mc.com/img" + i);
-            if (i % 2 == 0)
-              mc.setImage(img);
-            originRepository.save(mc);
-        }
-      }
-    }
-    catch(DataAccessException daoException) {
-      msg += "DataAccessException_" + daoException.getMessage();
-    }
-    return msg;
-  }
-
-  @GetMapping("/populate")
+  /*@GetMapping("/populate")
   public String populateDataPage(
     @RequestParam(
       value = "lang",
@@ -401,33 +373,108 @@ public class HtmlController {
 
     model.addAttribute("appName", msg);
     return "index";    
-  }
+  }*/
 
   @GetMapping("/hoangtuan")
   public String populateHoangTuanDataPage(
     @RequestParam(
-      value = "lang",
+      value = "password",
       required = false,
       defaultValue = ""
-    ) String lang,
+    ) String password,
     Model model
   ) {
-    if (lang.length() == 0) {
-      lang = Language.VN.name();
+    if (password.length() <= 5) {
+      model.addAttribute("appName", "Your password is too short!");
+      return "index";
+    }
+    if (password.compareTo("123456") != 0) {
+      model.addAttribute("appName", "Wrong password!");
+      return "index";
     }
     String msg = "";
 
     msg += populateUnitHoangTuanData();
     msg += populateOriginCountryHoangTuanData();
     msg += populateCategoryHoangTuanData();
-    msg += populateProductHoangTuanData(lang);
-
+    msg += populateProductHoangTuanData("VN");
 
     model.addAttribute("appName", msg);
     return "index";
   }
 
   private String populateUnitHoangTuanData() {
+    String msg = "";
+    UnitRepository ur = null;
+
+    try {
+      // DimensionUnit
+      ur = this.inheritanceDAO.getRepository(DimensionUnit.class);
+      DimensionUnit u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(1);
+      u.setName("m");
+      ur.save(u);
+
+      u = this.inheritanceDAO.createModelObject(DimensionUnit.class);
+      u.setId(2);
+      u.setName("kg");
+      ur.save(u);
+      u = (DimensionUnit) ur.findById(1).orElse(null);
+
+      // ProductUnit - dummy
+      ur = this.inheritanceDAO.getRepository(ProductUnit.class);
+      ProductUnit p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(1);
+      p.setName("cái");
+      ur.save(p);
+
+      p = this.inheritanceDAO.createModelObject(ProductUnit.class);
+      p.setId(2);
+      p.setName("thanh");
+      ur.save(p);
+
+      // ManufacturedProductUnit
+      ur = this.inheritanceDAO.getRepository(ManufacturedProductUnit.class);
+      ManufacturedProductUnit mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(101);
+      mp.setName("thanh");
+      mp.setValue(4);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(102);
+      mp.setName("thanh");
+      mp.setValue(6);
+      ur.save(mp);
+
+      mp = this.inheritanceDAO.createModelObject(ManufacturedProductUnit.class);
+      mp.setDimensionUnit(u);
+      mp.setId(103);
+      mp.setName("thanh");
+      mp.setValue(8);
+      ur.save(mp);
+
+      // CustomizedCutProductUnit
+      CustomizedCutProductUnit cp = this.inheritanceDAO.createModelObject(CustomizedCutProductUnit.class);
+      cp.setDimensionUnit(u);
+      cp.setId(201);
+      cp.setName("thanh");
+      cp.setMinValue(1);
+      cp.setMaxValue(3);
+      ur.save(cp);
+
+      msg += " [Unit->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException@Unit" + daoException.getMessage();
+    }
+
+    return msg;
+  }
+
+  private String populateUnitHoangTuanData2() {
     String msg = "";
     UnitRepository ur = null;
 
@@ -504,6 +551,12 @@ public class HtmlController {
       "tw",
       "cn"
     };
+    //////
+    String[] names = {
+      "Việt Nam",
+      "Đài Loan",
+      "Trung Quốc"
+    };
     String[] uris = {
       "flags/vn.png",
       "flags/tw.png",
@@ -515,6 +568,7 @@ public class HtmlController {
       for(int i = 0; i < codes.length; i++) {
           ManufactureCountry mc = new ManufactureCountry();
           mc.setCode(codes[i]);
+          mc.setName(names[i]);
           Image img = new Image();
           img.setUri(uris[i]);
           this.originRepository.save(mc);
@@ -528,6 +582,81 @@ public class HtmlController {
   }
 
   private String populateCategoryHoangTuanData() {
+    String[] names = {
+      "Rod and flats",              // 0. Rod and flats
+      "Pipes and tubes",            // 1. Pipes and tubes
+      "Angles and channels",        // 2. Angles and channels
+      "Hardware",                   // 3. Hardware
+      "Architectural",              // 4. Architectural
+      "Transport and bus body",     // 5. Transport and bus body
+      "Electrical",                 // 6. Electrical
+      "Transmission line hardware", // 7. Transmission line hardware
+      "Industrial",                 // 8. Industrial
+      "Miscellaneous",              // 9. Miscellaneous
+      // 0. Rod and flats childs:
+      "Round Rod",                  // 10. Round Rod
+      "Flat Bar",                   // 11. Flat Bar
+      "Round Edge Flat",            // 12. Round Edge Flat
+      "Haft Round Flat",            // 13. Haft Round Flat
+      "Flat Coil Form",             // 14. Flat Coil Form
+      "Square Bar",                 // 15. Square Bar
+      "Rectangular Flat Bar",       // 16. Rectangular Flat Bar
+      // 1. Pipes and tubes childs:
+      // 2. Angles and channels childs:
+      // 3. Hardware childs:
+      // 4. Architectural childs:
+      // 5. Transport and bus body childs:
+      // 6. Electrical childs:
+      // 7. Transmission line hardware childs:
+      // 8. Industrial childs:
+      // 9. Miscellaneous childs:
+    };
+
+    Integer[] parents = {
+      null,                // 0. Rod and flats
+      null,                // 1. Pipes and tubes
+      null,                // 2. Angles and channels
+      null,                // 3. Hardware
+      null,                // 4. Architectural
+      null,                // 5. Transport and bus body
+      null,                // 6. Electrical
+      null,                // 7. Transmission line hardware
+      null,                // 8. Industrial
+      null,                // 9. Miscellaneous
+      0,                   // 10. Round Rod
+      0,                   // 11. Flat Bar
+      0,                   // 12. Round Edge Flat
+      0,                   // 13. Haft Round Flat
+      0,                   // 14. Flat Coil Form
+      0,                   // 15. Square Bar 
+      0,                   // 16. Rectangular Flat Bar 
+    };
+
+    String msg = "";
+
+    try {
+      for(int i = 0; i < names.length; i++) {
+        Category cat = new Category();
+        cat.setId(i);
+        cat.setName(names[i]);
+        Integer parentId = parents[i];
+        if (parentId != null) {
+          // Load parent
+          Category parentCat = this.categoryRepository.findById(parentId).orElse(null);
+          // Set parent
+          cat.setParentCategory(parentCat);
+        }
+        this.categoryRepository.save(cat);
+      }
+      msg += " [Category->OK]";
+    }
+    catch(DataAccessException daoException) {
+      msg += " DataAccessException@Category " + daoException.getMessage();
+    }
+    return msg;
+  }
+
+  private String populateCategoryHoangTuanData2() {
     String[] names = {
       "RF",                // 0. Rod and flats
       "PT",                // 1. Pipes and tubes
@@ -605,34 +734,34 @@ public class HtmlController {
   private String populateProductHoangTuanData(String lang) {
     String[] productNames = new String[] {
       // product name line by line
-      "Round Rod",
-      "Round Rod"
+      "Round Rod small",
+      "Round Rod small"
     };
 
     String[] productBrief = new String[] {
       // product brief line by line
-      "Round Rod small",
-      "Round Rod small",
+      "D=5.00mm, Weight 195GM/3.66M",
+      "D=5.00mm, Weight 195GM/3.66M",
     };
 
     String[] productDesc = new String[] {
       // product desc line by line
-      "Round Rod small: D=5.00mm, Weight 195GM/3.66M",
-      "Round Rod small: D=5.00mm, Weight 195GM/3.66M",
+      "Sản phẩm chất lượng tốt của công ty Yuan Sheng chất lượng hơn hẳn sản phẩm mua ở chợ Dân Sinh",
+      "Sản phẩm mới, hợp kim nhôm chịu nhiệt cao lên tới 500oC mà vẫn chưa bị nóng chảy. Dùng trong hàng hãi và vũ trụ. Hàng xách tay nên vui lòng gọi điện trước khi đến, để biết tình trạng còn hàng.",
     };
-
-
 
     String[] productCodes = new String[] {
       // product code line by line
       "ht-1149-a",
       "ht-1149-b",
     };
+
     String[] originIds = new String[] {
       // product orgin line by line
       "tw",
       "cn",
     };
+
     String[][] productsImages = new String[][] {
       new String[] { // list of images for product 0
         "/products/ht-1149-1.jpg",
@@ -668,7 +797,8 @@ public class HtmlController {
       }
     };
 
-    ProductRepository productRepository = this.multiLocaleDAO.getRepository(lang);
+    //////ProductRepository productRepository = this.multiLocaleDAO.getRepository(lang);
+    ProductRepository productRepository = productRepositories[0];
     String msg = "";
 
     try {
@@ -678,7 +808,8 @@ public class HtmlController {
       Category cat = this.categoryRepository.findById(10).orElse(null);
       for (i = 0; i < productCodes.length; i++) {
         // Create product
-        Product p = (Product)multiLocaleDAO.createModelObject(lang);
+        //////Product p = (Product)multiLocaleDAO.createModelObject(lang);
+        Product p = new ProductVN();
         p.setCode(productCodes[i]);
         p.setCategory(cat);
         p.setName(productNames[i]);
@@ -715,8 +846,39 @@ public class HtmlController {
     }
     return msg;
   }
+
+  /*private String populateManufactureCountry() {
+    String[] codes = {
+      "vn",
+      "tw",
+      "cn"
+    };
+    String msg = "";
+    // In case there is no ManufactureCountry, populate it
+    try {
+      Iterable<ManufactureCountry> iter = originRepository.findAll();
+      int n = 0;
+      for (ManufactureCountry o : iter) {
+          n++;
+      }
+      if (n == 0) {
+        msg += "No ManufactureCountry found, popupate some data...\n";
+        for(int i = 0; i < codes.length; i++) {
+            ManufactureCountry mc = new ManufactureCountry();
+            mc.setCode(codes[i]);
+            Image img = new Image();
+            img.setUri("http://www.mc.com/img" + i);
+            if (i % 2 == 0)
+              mc.setImage(img);
+            originRepository.save(mc);
+        }
+      }
+    }
+    catch(DataAccessException daoException) {
+      msg += "DataAccessException_" + daoException.getMessage();
+    }
+    return msg;
+  }*/
 }
-
-
 
 
