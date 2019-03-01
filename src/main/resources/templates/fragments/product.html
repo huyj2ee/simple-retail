@@ -77,7 +77,7 @@
       <div>Giá:</div>
       <div>
         <span th:each="price: ${product.prices}">
-          <b th:text="'Kích thước ' + ${price.unitId} + ':'"/>
+          <b th:text="'Kích thước ' + ${price.unit.fullName} + ':'" />
           &nbsp;
           <span th:text="${price.value} + ' đồng'"/>
           <br />

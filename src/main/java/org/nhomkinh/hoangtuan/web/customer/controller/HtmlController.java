@@ -779,27 +779,41 @@ public class HtmlController {
     // 103 - bar 8m
     // CustomizedCutProductUnit
     // 201 - bar 1-3m
-    int[][][] productsPrices = new int[][][] {
-      new int[][] {    // list of prices for product 0
+    String msg = "";
+    ProductUnit productUnit101 = null;
+    ProductUnit productUnit102 = null;
+    ProductUnit productUnit103 = null;
+    ProductUnit productUnit201 = null;
+
+    try {
+      productUnit101 = this.productUnitRepository.findById(101).orElse(null);
+      productUnit102 = this.productUnitRepository.findById(102).orElse(null);
+      productUnit103 = this.productUnitRepository.findById(103).orElse(null);
+      productUnit201 = this.productUnitRepository.findById(201).orElse(null);
+    }
+    catch(Exception e) {
+      msg += e.getMessage() + "\n";
+    }
+
+    Object[][][] productsPrices = new Object[][][] {
+      new Object[][] {    // list of prices for product 0
         // price[0] -> product unit, price[1] -> value
-        new int[] {101, 1400000},
-        new int[] {102, 1600000},
-        new int[] {103, 2600000},
-        new int[] {201,  420000}
+        new Object[] {productUnit101, 1400000},
+        new Object[] {productUnit102, 1600000},
+        new Object[] {productUnit103, 2600000},
+        new Object[] {productUnit201,  420000}
       },
-      new int[][] {    // list of prices for product 1
+      new Object[][] {    // list of prices for product 1
         // price[0] -> product unit, price[1] -> value
-        new int[] {101, 1300000},
-        new int[] {102, 1500000},
-        new int[] {103, 2500000},
-        new int[] {201,  400000}
-//        new int[] {201,  350000}
+        new Object[] {productUnit101, 1300000},
+        new Object[] {productUnit102, 1500000},
+        new Object[] {productUnit103, 2500000},
+        new Object[] {productUnit201,  400000}
       }
     };
 
     //////ProductRepository productRepository = this.multiLocaleDAO.getRepository(lang);
     ProductRepository productRepository = productRepositories[0];
-    String msg = "";
 
     try {
       int i;
@@ -826,14 +840,19 @@ public class HtmlController {
           p.getImages().add(img);
         }
         // Attach product to its unit objects and create price
-        int[][] productPrices = productsPrices[i];
+        Object[][] productPrices = productsPrices[i];
         for (j = 0; j < productPrices.length; j++) {
-          int[] productPrice = productPrices[j];
-          Price price = new Price();
-          price.setDate(new Date(100));
-          price.setUnitId(productPrice[0]);
-          price.setValue(productPrice[1]);
-          p.getPrices().add(price);
+          try {
+            Object[] productPrice = productPrices[j];
+            Price price = new Price();
+            price.setDate(new Date(100));
+            price.setUnit((ProductUnit) productPrice[0]);
+            price.setValue((Integer) productPrice[1]);
+            p.getPrices().add(price);
+          }
+          catch(Exception e) {
+            msg += e.getMessage() + "\n";
+          }
         }
         productRepository.save(p);
       }

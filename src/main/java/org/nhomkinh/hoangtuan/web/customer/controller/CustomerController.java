@@ -257,8 +257,7 @@ public class CustomerController {
 
     debugMsg.append("\n\tPrices:");
     for (Price price : p.getPrices()) {
-      ProductUnit pu = this.productUnitRepository.findById(price.getUnitId())
-        .orElse(null);
+      ProductUnit pu = price.getUnit();
       if (pu != null) {
         debugMsg.append("\n\t\t");
         debugMsg.append(pu.getId());
